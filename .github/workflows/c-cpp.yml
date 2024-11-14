@@ -1,0 +1,31 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Instalar dependências necessárias, como Boost
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential libboost-all-dev
+
+    # Compilar o projeto
+    - name: Build project
+      run: make all
+
+    # Executar os testes
+    - name: Run tests
+      run: make test
+
+    # Limpar arquivos gerados pela compilação
+    - name: Clean up
+      run: make clean
