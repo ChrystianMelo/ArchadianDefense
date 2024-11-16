@@ -6,7 +6,7 @@
 #include "GraphNode.h"
 #include "Algorithms.h"
 
-// Teste simplificado da fun��o Kosaraju para encontrar componentes fortemente conectadas
+// Teste simplificado da função Kosaraju para encontrar componentes fortemente conectadas
 BOOST_AUTO_TEST_CASE(Kosaraju_Simplified) {
 	GraphNode node1(1), node2(2), node3(3);
 
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(Kosaraju_Simplified) {
 	}
 }
 
-// Teste da fun��o Kosaraju para encontrar componentes fortemente conectadas
+// Teste da função Kosaraju para encontrar componentes fortemente conectadas
 BOOST_AUTO_TEST_CASE(Kosaraju) {
 	GraphNode node1(1), node2(2), node3(3), node4(4), node5(5);
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(Kosaraju) {
 	}
 }
 
-// Teste 1: N�s Isolados
+// Teste 1: Nós Isolados
 BOOST_AUTO_TEST_CASE(Kosaraju_IsolatedNodesTest) {
 	GraphNode node1(1), node2(2), node3(3);
 
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(Kosaraju_FullyConnectedGraphTest) {
 	assert(foundSCC == expectedSCC);
 }
 
-// Teste 3: Grafo com V�rias SCCs Individuais
+// Teste 3: Grafo com Várias SCCs Individuais
 BOOST_AUTO_TEST_CASE(Kosaraju_MultipleSingleNodeSCCsTest) {
 	GraphNode node1(1), node2(2), node3(3), node4(4);
 
@@ -199,5 +199,51 @@ BOOST_AUTO_TEST_CASE(Kosaraju_MultipleSingleNodeSCCsTest) {
 			}
 		}
 		assert(scc_found);
+	}
+}
+
+BOOST_AUTO_TEST_CASE(Kosaraju_EulerianCycle) {
+	// Criar nós do grafo
+	GraphNode node1(1), node2(2), node3(3), node4(4);
+	
+	// Conectar as arestas para formar um ciclo euleriano
+	node1.connect(&node2);
+	node2.connect(&node3);
+	node3.connect(&node4);
+	node4.connect(&node1);
+	
+	// Criar o grafo com os nós
+	Graph graph({ node1, node2, node3, node4 });
+	
+	// Executar o algoritmo de Kosaraju para encontrar SCCs
+	std::vector<SCC> sccs = Algorithms::Kosaraju(&graph);
+	
+	// Converter as SCCs encontradas para um formato comparável
+	std::vector<std::unordered_set<std::size_t>> foundSCCs;
+	for (const auto& scc : sccs) {
+	std::unordered_set<std::size_t> scc_indices;
+	for (const auto& node : scc) {
+	    scc_indices.insert(node.getIndex());
+	}
+	foundSCCs.push_back(scc_indices);
+	}
+	
+	// O grafo completo é um único componente fortemente conectado
+	std::vector<std::unordered_set<std::size_t>> expectedSCCs = {
+	{1, 2, 3, 4}
+	};
+	
+	// Validar se as SCCs encontradas correspondem às esperadas
+	BOOST_REQUIRE_EQUAL(foundSCCs.size(), expectedSCCs.size());
+	
+	for (const auto& expected_scc : expectedSCCs) {
+	bool scc_found = false;
+	for (const auto& found_scc : foundSCCs) {
+	    if (found_scc == expected_scc) {
+		scc_found = true;
+		break;
+	    }
+	}
+	BOOST_CHECK(scc_found);
 	}
 }
