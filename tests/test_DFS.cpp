@@ -2,8 +2,8 @@
 
 #include <unordered_set>
 
-#include "Graph.h"
-#include "GraphNode.h"
+#include "Archadian.h"
+#include "City.h"
 #include "Algorithms.h"
 
 namespace {
@@ -12,31 +12,31 @@ namespace {
 		explicit VisitedNodeCollector()
 			: visited_() {}
 
-		void visit(GraphNode* node) override {
+		void visit(City* node) override {
 			visited_.insert(*node);
 		}
 
-		std::unordered_set<GraphNode> getVisited() {
+		std::unordered_set<City> getVisited() {
 			return visited_;
 		}
 	private:
-		std::unordered_set<GraphNode> visited_;
+		std::unordered_set<City> visited_;
 	};
 }
 
 // DFS visitas
 BOOST_AUTO_TEST_CASE(DFS_VisitsAllVertices) {
-	GraphNode node1(1), node2(2), node3(3), node4(4);
+	City node1(1), node2(2), node3(3), node4(4);
 
 	node1.connect(&node2);
 	node2.connect(&node3);
 	node3.connect(&node4);
 
-	Graph graph({ node1,node2,node3,node4 });
+	Archadian Archadian({ node1,node2,node3,node4 });
 
 	VisitedNodeCollector visitedNodeCollector = VisitedNodeCollector();
-	auto dfs_data = Algorithms::DFS(&graph, &visitedNodeCollector);
-	std::unordered_set<GraphNode> visited = visitedNodeCollector.getVisited();
+	auto dfs_data = Algorithms::DFS(&Archadian, &visitedNodeCollector);
+	std::unordered_set<City> visited = visitedNodeCollector.getVisited();
 
 	BOOST_CHECK(visited.find(node1) != visited.end());
 	BOOST_CHECK(visited.find(node2) != visited.end());
@@ -46,17 +46,17 @@ BOOST_AUTO_TEST_CASE(DFS_VisitsAllVertices) {
 	auto [colors, discovery_times, finishing_times] = dfs_data;
 
 	for (auto& node : { &node1, &node2, &node3, &node4 }) {
-		BOOST_CHECK(colors[node] == GraphNodeColor::FINISHED);
+		BOOST_CHECK(colors[node] == CityColor::FINISHED);
 	}
 
-	std::unordered_map<GraphNode*, std::size_t, GraphNodeHash, GraphNodeEqual> expected_discovery_times = {
+	std::unordered_map<City*, std::size_t, CityHash, CityEqual> expected_discovery_times = {
 		{ &node1, 1 },
 		{ &node2, 2 },
 		{ &node3, 3 },
 		{ &node4, 4 }
 	};
 
-	std::unordered_map<GraphNode*, std::size_t, GraphNodeHash, GraphNodeEqual> expected_finishing_times = {
+	std::unordered_map<City*, std::size_t, CityHash, CityEqual> expected_finishing_times = {
 		{ &node1, 8 },
 		{ &node2, 7 },
 		{ &node3, 6 },
@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE(DFS_VisitsAllVertices) {
 }
 
 // Teste DFS com um grafo mais complexo e verificação dos tempos esperados
-BOOST_AUTO_TEST_CASE(DFS_ComplexGraphTraversal) {
-	GraphNode node1(1), node2(2), node3(3), node4(4), node5(5), node6(6), node7(7);
+BOOST_AUTO_TEST_CASE(DFS_ComplexArchadianTraversal) {
+	City node1(1), node2(2), node3(3), node4(4), node5(5), node6(6), node7(7);
 
 	node1.connect(&node2);
 	node1.connect(&node3);
@@ -91,11 +91,11 @@ BOOST_AUTO_TEST_CASE(DFS_ComplexGraphTraversal) {
 	node6.connect(&node7);
 	node7.connect(&node1);
 
-	Graph graph({ node1, node2, node3, node4, node5, node6, node7 });
+	Archadian Archadian({ node1, node2, node3, node4, node5, node6, node7 });
 
 	VisitedNodeCollector visitedNodeCollector = VisitedNodeCollector();
-	DFS_DATA dfs_data = Algorithms::DFS(&graph, &visitedNodeCollector);
-	std::unordered_set<GraphNode> visited = visitedNodeCollector.getVisited();
+	DFS_DATA dfs_data = Algorithms::DFS(&Archadian, &visitedNodeCollector);
+	std::unordered_set<City> visited = visitedNodeCollector.getVisited();
 
 	BOOST_CHECK(visited.find(node1) != visited.end());
 	BOOST_CHECK(visited.find(node2) != visited.end());
@@ -108,10 +108,10 @@ BOOST_AUTO_TEST_CASE(DFS_ComplexGraphTraversal) {
 	auto [colors, discovery_times, finishing_times] = dfs_data;
 
 	for (auto& node : { &node1, &node2, &node3, &node4, &node5, &node6, &node7 }) {
-		BOOST_CHECK(colors[node] == GraphNodeColor::FINISHED);
+		BOOST_CHECK(colors[node] == CityColor::FINISHED);
 	}
 
-	std::unordered_map<GraphNode*, std::size_t, GraphNodeHash, GraphNodeEqual> expected_discovery_times = {
+	std::unordered_map<City*, std::size_t, CityHash, CityEqual> expected_discovery_times = {
 		{ &node1, 1 },
 		{ &node2, 2 },
 		{ &node3, 10 },
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(DFS_ComplexGraphTraversal) {
 		{ &node7, 4 }
 	};
 
-	std::unordered_map<GraphNode*, std::size_t, GraphNodeHash, GraphNodeEqual> expected_finishing_times = {
+	std::unordered_map<City*, std::size_t, CityHash, CityEqual> expected_finishing_times = {
 		{ &node1, 14 },
 		{ &node2, 9 },
 		{ &node3, 13 },
@@ -147,28 +147,28 @@ BOOST_AUTO_TEST_CASE(DFS_ComplexGraphTraversal) {
 }
 
 // Teste DFS em um grafo desconexo
-BOOST_AUTO_TEST_CASE(DFS_DisconnectedGraphTest) {
+BOOST_AUTO_TEST_CASE(DFS_DisconnectedArchadianTest) {
 	// Criação dos nós para o primeiro componente conectado
-	GraphNode node1(1), node2(2), node3(3);
+	City node1(1), node2(2), node3(3);
 
 	node1.connect(&node2);
 	node2.connect(&node3);
 
 	// Criação dos nós para o segundo componente conectado
-	GraphNode node4(4), node5(5);
+	City node4(4), node5(5);
 
 	node4.connect(&node5);
 
 	// Criação do nó isolado (terceiro componente)
-	GraphNode node6(6);
+	City node6(6);
 
 	// Criação do grafo com todos os nós
-	Graph graph({ node1, node2, node3, node4, node5, node6 });
+	Archadian Archadian({ node1, node2, node3, node4, node5, node6 });
 
 	// Execução do DFS e obtenção do retorno
 	VisitedNodeCollector visitedNodeCollector = VisitedNodeCollector();
-	DFS_DATA dfs_data = Algorithms::DFS(&graph, &visitedNodeCollector);
-	std::unordered_set<GraphNode> visited = visitedNodeCollector.getVisited();
+	DFS_DATA dfs_data = Algorithms::DFS(&Archadian, &visitedNodeCollector);
+	std::unordered_set<City> visited = visitedNodeCollector.getVisited();
 
 	// Verificação se todos os nós foram visitados
 	BOOST_CHECK(visited.find(node1) != visited.end());
@@ -184,12 +184,12 @@ BOOST_AUTO_TEST_CASE(DFS_DisconnectedGraphTest) {
 	// Verificação das cores dos nós após o DFS
 	for (auto& node : { &node1, &node2, &node3, &node4, &node5, &node6 }) {
 		// O nó deve estar marcado como "preto" após a conclusão do DFS
-		BOOST_CHECK(colors[node] == GraphNodeColor::FINISHED);
+		BOOST_CHECK(colors[node] == CityColor::FINISHED);
 	}
 
 	// Tempos esperados de descoberta e término para cada nó
 	// Supondo que o DFS explora os nós na ordem em que são fornecidos na lista de nós do grafo
-	std::unordered_map<GraphNode*, std::size_t, GraphNodeHash, GraphNodeEqual> expected_discovery_times = {
+	std::unordered_map<City*, std::size_t, CityHash, CityEqual> expected_discovery_times = {
 		{ &node1, 1 },
 		{ &node2, 2 },
 		{ &node3, 3 },
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(DFS_DisconnectedGraphTest) {
 		{ &node6, 11 }
 	};
 
-	std::unordered_map<GraphNode*, std::size_t, GraphNodeHash, GraphNodeEqual> expected_finishing_times = {
+	std::unordered_map<City*, std::size_t, CityHash, CityEqual> expected_finishing_times = {
 		{ &node1, 6 },
 		{ &node2, 5 },
 		{ &node3, 4 },

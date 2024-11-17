@@ -1,27 +1,27 @@
-#ifndef GRAPHEDGE_H
-#define GRAPHEDGE_H
+#ifndef Road_H
+#define Road_H
 
-#include "GraphNode.h"
+#include "City.h"
 
-class GraphNode;
+class City;
 
 /**
- * \class GraphEdge
+ * \class Road
  * \brief Representa uma aresta (conexão) entre dois nós em um grafo.
  *
- * Uma GraphEdge conecta dois nós (GraphNodes) em um grafo, criando uma relação
+ * Uma Road conecta dois nós (Citys) em um grafo, criando uma relação
  * de vizinhança entre os nós.
  */
-class GraphEdge {
+class Road {
 public:
 	/**
-	 * \brief Construtor de GraphEdge.
+	 * \brief Construtor de Road.
 	 * \param source Nó de origem da aresta.
 	 * \param target Nó de destino da aresta.
 	 *
 	 * Cria uma aresta que conecta o nó de origem ao nó de destino.
 	 */
-	GraphEdge(GraphNode* source, GraphNode* target);
+	Road(City* source, City* target);
 
 	/**
 	 * \brief Obtém o nó de origem da aresta.
@@ -29,7 +29,7 @@ public:
 	 *
 	 * Retorna o nó de onde a aresta se origina.
 	 */
-	GraphNode* getSource() const;
+	City* getSource() const;
 
 	/**
 	 * \brief Obtém o nó de destino da aresta.
@@ -37,7 +37,7 @@ public:
 	 *
 	 * Retorna o nó para onde a aresta aponta.
 	 */
-	GraphNode* getTarget() const;
+	City* getTarget() const;
 
 	/**
 	 *
@@ -47,7 +47,7 @@ public:
 	/**
 	 *
 	 */
-	bool operator==(const GraphEdge& other) const;
+	bool operator==(const Road& other) const;
 
 private:
 	/**
@@ -55,16 +55,16 @@ private:
 	 *
 	 * Armazena o nó de onde a aresta se origina.
 	 */
-	GraphNode* m_source;
+	City* m_source;
 
 	/**
 	 * \brief O nó de destino da aresta.
 	 *
 	 * Armazena o nó para onde a aresta aponta.
 	 */
-	GraphNode* m_target;
+	City* m_target;
 
 	int m_weight = 1;
 };
 
-#endif // GRAPHEDGE_H
+#endif // Road_H

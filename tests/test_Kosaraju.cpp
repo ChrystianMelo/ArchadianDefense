@@ -2,22 +2,22 @@
 
 #include <unordered_set>
 
-#include "Graph.h"
-#include "GraphNode.h"
+#include "Archadian.h"
+#include "City.h"
 #include "Algorithms.h"
 
-// Teste simplificado da funÃ§Ã£o Kosaraju para encontrar componentes fortemente conectadas
+// Teste simplificado da função Kosaraju para encontrar componentes fortemente conectadas
 BOOST_AUTO_TEST_CASE(Kosaraju_Simplified) {
-	GraphNode node1(1), node2(2), node3(3);
+	City node1(1), node2(2), node3(3);
 
 	node1.connect(&node2);
 	node2.connect(&node1);
 
 	node3.connect(&node2);
 
-	Graph graph({ node1, node2, node3 });
+	Archadian Archadian({ node1, node2, node3 });
 
-	std::vector<SCC> sccs = Algorithms::Kosaraju(&graph);
+	std::vector<SCC> sccs = Algorithms::Kosaraju(&Archadian);
 
 	std::vector<std::unordered_set<std::size_t>> foundSCCs;
 	for (const auto& scc : sccs) {
@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE(Kosaraju_Simplified) {
 	}
 }
 
-// Teste da funÃ§Ã£o Kosaraju para encontrar componentes fortemente conectadas
+// Teste da função Kosaraju para encontrar componentes fortemente conectadas
 BOOST_AUTO_TEST_CASE(Kosaraju) {
-	GraphNode node1(1), node2(2), node3(3), node4(4), node5(5);
+	City node1(1), node2(2), node3(3), node4(4), node5(5);
 
 	node1.connect(&node2);
 	node2.connect(&node3);
@@ -58,9 +58,9 @@ BOOST_AUTO_TEST_CASE(Kosaraju) {
 	node4.connect(&node5);
 	node5.connect(&node4);
 
-	Graph graph({ node1, node2, node3, node4, node5 });
+	Archadian Archadian({ node1, node2, node3, node4, node5 });
 
-	std::vector<SCC> sccs = Algorithms::Kosaraju(&graph);
+	std::vector<SCC> sccs = Algorithms::Kosaraju(&Archadian);
 
 	std::vector<std::unordered_set<std::size_t>> foundSCCs;
 	for (const auto& scc : sccs) {
@@ -88,17 +88,17 @@ BOOST_AUTO_TEST_CASE(Kosaraju) {
 	}
 }
 
-// Teste 1: NÃ³s Isolados
+// Teste 1: Nós Isolados
 BOOST_AUTO_TEST_CASE(Kosaraju_IsolatedNodesTest) {
-	GraphNode node1(1), node2(2), node3(3);
+	City node1(1), node2(2), node3(3);
 
-	GraphNode node4(4), node5(5);
+	City node4(4), node5(5);
 	node4.connect(&node5);
 	node5.connect(&node4);
 
-	Graph graph({ node1, node2, node3, node4, node5 });
+	Archadian Archadian({ node1, node2, node3, node4, node5 });
 
-	std::vector<SCC> sccs = Algorithms::Kosaraju(&graph);
+	std::vector<SCC> sccs = Algorithms::Kosaraju(&Archadian);
 
 	std::vector<std::unordered_set<std::size_t>> foundSCCs;
 	for (const auto& scc : sccs) {
@@ -127,8 +127,8 @@ BOOST_AUTO_TEST_CASE(Kosaraju_IsolatedNodesTest) {
 }
 
 // Teste 2: Grafo Totalmente Conectado
-BOOST_AUTO_TEST_CASE(Kosaraju_FullyConnectedGraphTest) {
-	GraphNode node1(1), node2(2), node3(3), node4(4);
+BOOST_AUTO_TEST_CASE(Kosaraju_FullyConnectedArchadianTest) {
+	City node1(1), node2(2), node3(3), node4(4);
 
 	node1.connect(&node2);
 	node1.connect(&node3);
@@ -146,9 +146,9 @@ BOOST_AUTO_TEST_CASE(Kosaraju_FullyConnectedGraphTest) {
 	node4.connect(&node2);
 	node4.connect(&node3);
 
-	Graph graph({ node1, node2, node3, node4 });
+	Archadian Archadian({ node1, node2, node3, node4 });
 
-	std::vector<SCC> sccs = Algorithms::Kosaraju(&graph);
+	std::vector<SCC> sccs = Algorithms::Kosaraju(&Archadian);
 
 	std::unordered_set<std::size_t> foundSCC;
 	for (const auto& scc : sccs) {
@@ -164,13 +164,13 @@ BOOST_AUTO_TEST_CASE(Kosaraju_FullyConnectedGraphTest) {
 	assert(foundSCC == expectedSCC);
 }
 
-// Teste 3: Grafo com VÃ¡rias SCCs Individuais
+// Teste 3: Grafo com Várias SCCs Individuais
 BOOST_AUTO_TEST_CASE(Kosaraju_MultipleSingleNodeSCCsTest) {
-	GraphNode node1(1), node2(2), node3(3), node4(4);
+	City node1(1), node2(2), node3(3), node4(4);
 
-	Graph graph({ node1, node2, node3, node4 });
+	Archadian Archadian({ node1, node2, node3, node4 });
 
-	std::vector<SCC> sccs = Algorithms::Kosaraju(&graph);
+	std::vector<SCC> sccs = Algorithms::Kosaraju(&Archadian);
 
 	std::vector<std::unordered_set<std::size_t>> foundSCCs;
 	for (const auto& scc : sccs) {
@@ -203,47 +203,47 @@ BOOST_AUTO_TEST_CASE(Kosaraju_MultipleSingleNodeSCCsTest) {
 }
 
 BOOST_AUTO_TEST_CASE(Kosaraju_EulerianCycle) {
-	// Criar nÃ³s do grafo
-	GraphNode node1(1), node2(2), node3(3), node4(4);
-	
+	// Criar nós do grafo
+	City node1(1), node2(2), node3(3), node4(4);
+
 	// Conectar as arestas para formar um ciclo euleriano
 	node1.connect(&node2);
 	node2.connect(&node3);
 	node3.connect(&node4);
 	node4.connect(&node1);
-	
-	// Criar o grafo com os nÃ³s
-	Graph graph({ node1, node2, node3, node4 });
-	
+
+	// Criar o grafo com os nós
+	Archadian Archadian({ node1, node2, node3, node4 });
+
 	// Executar o algoritmo de Kosaraju para encontrar SCCs
-	std::vector<SCC> sccs = Algorithms::Kosaraju(&graph);
-	
-	// Converter as SCCs encontradas para um formato comparÃ¡vel
+	std::vector<SCC> sccs = Algorithms::Kosaraju(&Archadian);
+
+	// Converter as SCCs encontradas para um formato comparável
 	std::vector<std::unordered_set<std::size_t>> foundSCCs;
 	for (const auto& scc : sccs) {
-	std::unordered_set<std::size_t> scc_indices;
-	for (const auto& node : scc) {
-	    scc_indices.insert(node.getIndex());
+		std::unordered_set<std::size_t> scc_indices;
+		for (const auto& node : scc) {
+			scc_indices.insert(node.getIndex());
+		}
+		foundSCCs.push_back(scc_indices);
 	}
-	foundSCCs.push_back(scc_indices);
-	}
-	
-	// O grafo completo Ã© um Ãºnico componente fortemente conectado
+
+	// O grafo completo é um único componente fortemente conectado
 	std::vector<std::unordered_set<std::size_t>> expectedSCCs = {
 	{1, 2, 3, 4}
 	};
-	
-	// Validar se as SCCs encontradas correspondem Ã s esperadas
+
+	// Validar se as SCCs encontradas correspondem às esperadas
 	BOOST_REQUIRE_EQUAL(foundSCCs.size(), expectedSCCs.size());
-	
+
 	for (const auto& expected_scc : expectedSCCs) {
-	bool scc_found = false;
-	for (const auto& found_scc : foundSCCs) {
-	    if (found_scc == expected_scc) {
-		scc_found = true;
-		break;
-	    }
-	}
-	BOOST_CHECK(scc_found);
+		bool scc_found = false;
+		for (const auto& found_scc : foundSCCs) {
+			if (found_scc == expected_scc) {
+				scc_found = true;
+				break;
+			}
+		}
+		BOOST_CHECK(scc_found);
 	}
 }

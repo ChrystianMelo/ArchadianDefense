@@ -9,7 +9,7 @@ namespace {
 	 */
 	class NullNodeVisitor : public NodeVisitor {
 	public:
-		void visit(GraphNode* node) override {
+		void visit(City* node) override {
 		}
 	};
 
@@ -19,15 +19,24 @@ namespace {
 	class SCCNodeVisitor : public NodeVisitor {
 	public:
 		SCCNodeVisitor()
-			: m_sccs(), scc_(), prevNode_(nullptr) {}
+			: m_sccs(), scc_(), prev_dfs_main_visit(nullptr), prev_node(nullptr) {}
 
-		void visit(GraphNode* node) override {
-			if (prevNode_ != nullptr && !prevNode_->isConnected(node)) {
+		void visit(City* node) override {
+			assert(dfs_main_visit != nullptr);
+
+			if (prev_dfs_main_visit == nullptr) prev_dfs_main_visit = dfs_main_visit;
+
+			if (prev_dfs_main_visit != dfs_main_visit && !scc_.empty()) {
 				m_sccs.push_back(scc_);
 				scc_ = SCC();
+				prev_dfs_main_visit = dfs_main_visit;
 			}
+		
+			if(prev_node != nullptr  && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
+				scc_.push_back(*dfs_recent_visit);
+
 			scc_.push_back(*node);
-			prevNode_ = node;
+			prev_node = node;
 		}
 
 		void finalize() {
@@ -40,7 +49,8 @@ namespace {
 	private:
 		std::vector<SCC> m_sccs;
 		SCC scc_;                 // SCC atual sendo construído
-		GraphNode* prevNode_;     // Último nó visitado
+		City* prev_dfs_main_visit;     
+		City* prev_node;     // Último nó visitado
 	};
 
 
@@ -49,22 +59,24 @@ namespace {
 	 *
 	 * \see Algorithms::dfs()
 	 */
-	static void dfs_visit(GraphNode* node, std::size_t* time,
-		std::unordered_map<GraphNode*, GraphNodeColor, GraphNodeHash, GraphNodeEqual>* coloring,
-		std::unordered_map<GraphNode*, DiscoveryTime, GraphNodeHash, GraphNodeEqual>* start,
-		std::unordered_map<GraphNode*, FinishingTime, GraphNodeHash, GraphNodeEqual>* finish,
+	static void dfs_visit(City* node, std::size_t* time,
+		std::unordered_map<City*, CityColor, CityHash, CityEqual>* coloring,
+		std::unordered_map<City*, DiscoveryTime, CityHash, CityEqual>* start,
+		std::unordered_map<City*, FinishingTime, CityHash, CityEqual>* finish,
 		NodeVisitor* nodeVisitor) {
 		(*time)++;
 		(*start)[node] = *time;
-		(*coloring)[node] = GraphNodeColor::DISCOVERED;
+		(*coloring)[node] = CityColor::DISCOVERED;
 
 		nodeVisitor->visit(node);
 
-		for (GraphEdge& edge : node->getEdges())
-			if (GraphNode* target = edge.getTarget(); (*coloring)[target] == GraphNodeColor::UNDISCOVERED)
+		for (Road& edge : node->getEdges())
+			if (City* target = edge.getTarget(); (*coloring)[target] == CityColor::UNDISCOVERED) {
+				nodeVisitor->dfs_recent_visit = node;
 				dfs_visit(target, time, coloring, start, finish, nodeVisitor);
+			}
 
-		(*coloring)[node] = GraphNodeColor::FINISHED;
+		(*coloring)[node] = CityColor::FINISHED;
 		(*time)++;
 		(*finish)[node] = *time;
 	}
@@ -72,10 +84,10 @@ namespace {
 	/**
 	* \brief
 	*/
-	std::vector<GraphNode> sortNodesByFinishingTime(
-		std::vector<GraphNode>& nodes,
-		std::unordered_map<GraphNode*, FinishingTime, GraphNodeHash, GraphNodeEqual>& finishingTime) {
-		std::vector<GraphNode*> nodePointers;
+	std::vector<City> sortNodesByFinishingTime(
+		std::vector<City>& nodes,
+		std::unordered_map<City*, FinishingTime, CityHash, CityEqual>& finishingTime) {
+		std::vector<City*> nodePointers;
 		for (auto& node : nodes) {
 			nodePointers.push_back(&node);
 		}
@@ -89,7 +101,7 @@ namespace {
 			}
 		}
 
-		std::vector<GraphNode> nodes2;
+		std::vector<City> nodes2;
 		for (auto node : nodePointers) {
 			nodes2.push_back(*node);
 		}
@@ -98,85 +110,88 @@ namespace {
 	}
 }
 
-DFS_DATA Algorithms::DFS(Graph* graph, NodeVisitor* nodeVisitor) {
-	return Algorithms::DFS(graph->getNodes(), nodeVisitor);
+DFS_DATA Algorithms::DFS(Archadian* Archadian, NodeVisitor* nodeVisitor) {
+	return Algorithms::DFS(Archadian->getNodes(), nodeVisitor);
 }
 
-DFS_DATA Algorithms::DFS(std::vector<GraphNode>& visitingNodes, NodeVisitor* nodeVisitor) {
-	std::unordered_map<GraphNode*, GraphNodeColor, GraphNodeHash, GraphNodeEqual> coloring;
-	std::unordered_map<GraphNode*, DiscoveryTime, GraphNodeHash, GraphNodeEqual> start;
-	std::unordered_map<GraphNode*, FinishingTime, GraphNodeHash, GraphNodeEqual> finish;
+DFS_DATA Algorithms::DFS(std::vector<City>& visitingNodes, NodeVisitor* nodeVisitor) {
+	std::unordered_map<City*, CityColor, CityHash, CityEqual> coloring;
+	std::unordered_map<City*, DiscoveryTime, CityHash, CityEqual> start;
+	std::unordered_map<City*, FinishingTime, CityHash, CityEqual> finish;
 
-	for (GraphNode& node : visitingNodes) {
-		coloring[&node] = GraphNodeColor::UNDISCOVERED;
+	for (City& node : visitingNodes) {
+		coloring[&node] = CityColor::UNDISCOVERED;
 		start[&node] = 0;
 		finish[&node] = 0;
 	}
 
 	std::size_t time = 0;
 
-	for (GraphNode& node : visitingNodes)
-		if (coloring[&node] == GraphNodeColor::UNDISCOVERED)
+	for (City& node : visitingNodes)
+		if (coloring[&node] == CityColor::UNDISCOVERED) {
+			nodeVisitor->dfs_recent_visit = nullptr;
+			nodeVisitor->dfs_main_visit = &node;
 			dfs_visit(&node, &time, &coloring, &start, &finish, nodeVisitor);
+		}
 
 	return std::make_tuple(coloring, start, finish);;
 }
 
-void Algorithms::transposeGraph(Graph& graph) {
-	std::unordered_map<std::size_t, std::vector<GraphNode*>> invertedEdges;
+void Algorithms::transposeArchadian(Archadian& Archadian) {
+	std::unordered_map<std::size_t, std::vector<City*>> invertedEdges;
 
-	for (auto& node : graph.getNodes()) {
+	for (auto& node : Archadian.getNodes()) {
 		for (const auto& edge : node.getEdges()) {
 			invertedEdges[edge.getTarget()->getIndex()].push_back(&node);
 		}
 	}
 
-	for (auto& node : graph.getNodes()) {
+	for (auto& node : Archadian.getNodes()) {
 		node.setEdges({});
 	}
 
-	for (auto& node : graph.getNodes()) {
-		for (GraphNode* sourceNode : invertedEdges[node.getIndex()]) {
+	for (auto& node : Archadian.getNodes()) {
+		for (City* sourceNode : invertedEdges[node.getIndex()]) {
 			node.connect(sourceNode);
 		}
 	}
 }
 
 
-std::vector<SCC> Algorithms::Kosaraju(Graph* graph) {
+std::vector<SCC> Algorithms::Kosaraju(Archadian* Archadian) {
 	NullNodeVisitor nullVisitor = NullNodeVisitor();
-	DFS_DATA data = Algorithms::DFS(graph, &nullVisitor);
+	DFS_DATA data = Algorithms::DFS(Archadian, &nullVisitor);
 	auto& finishingTime = std::get<2>(data);
 
-	Algorithms::transposeGraph(*graph);
+	Algorithms::transposeArchadian(*Archadian);
 
-	std::vector<GraphNode> nodes2 = sortNodesByFinishingTime(graph->getNodes(), finishingTime);
+	std::vector<City> nodes2 = sortNodesByFinishingTime(Archadian->getNodes(), finishingTime);
 
 	SCCNodeVisitor visitor = SCCNodeVisitor();
 	Algorithms::DFS(nodes2, &visitor);
 	visitor.finalize();
 
-	Algorithms::transposeGraph(*graph);
+	Algorithms::transposeArchadian(*Archadian);
 
 	return visitor.getSCCS();
 }
 
-std::unordered_map<GraphNode*, int, GraphNodeHash, GraphNodeEqual> Algorithms::Dijkstra(Graph* graph, GraphNode& source) {
+std::unordered_map<City*, int, CityHash, CityEqual> Algorithms::Dijkstra(Archadian* Archadian, City& source) {
 	// Define a distância inicial como infinito
-	std::unordered_map<GraphNode*, int, GraphNodeHash, GraphNodeEqual> distances;
-	for (GraphNode& node : graph->getNodes()) {
-		distances[&node] = std::numeric_limits<int>::max();
+	std::unordered_map<City*, int, CityHash, CityEqual> distances;
+	for (City& node : Archadian->getNodes()) {
+		distances[&node] = 999;//std::numeric_limits<int>::max();
 	}
 	distances[&source] = 0;
 
 	// Fila de prioridade para selecionar o nodo com a menor distância
-	using NodeDistPair = std::pair<int, GraphNode*>;
+	using NodeDistPair = std::pair<int, City*>;
 	std::priority_queue<NodeDistPair, std::vector<NodeDistPair>, std::greater<NodeDistPair>> queue;
 	queue.push({ 0, &source });
 
 	while (!queue.empty()) {
 		int distance = queue.top().first;
-		GraphNode* current = queue.top().second;
+		City* current = queue.top().second;
 		queue.pop();
 
 		// Ignorar se a distância é maior do que a registrada
@@ -184,8 +199,8 @@ std::unordered_map<GraphNode*, int, GraphNodeHash, GraphNodeEqual> Algorithms::D
 		if (distance > curretDistance) continue;
 
 		// Verificar vizinhos
-		for (const GraphEdge& edge : current->getEdges()) {
-			GraphNode* neighbor = edge.getTarget();
+		for (const Road& edge : current->getEdges()) {
+			City* neighbor = edge.getTarget();
 			int newDist = distances[current] + edge.getWeight();
 
 			// Atualizar a distância se o caminho atual é mais curto

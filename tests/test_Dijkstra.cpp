@@ -1,20 +1,20 @@
-#include <boost/test/unit_test.hpp>
+ï»¿#include <boost/test/unit_test.hpp>
 
-#include "Graph.h"
-#include "GraphNode.h"
+#include "Archadian.h"
+#include "City.h"
 #include "Algorithms.h"
 
-// Teste do algoritmo de Dijkstra para calcular a distância mínima
+// Teste do algoritmo de Dijkstra para calcular a distï¿½ncia mï¿½nima
 BOOST_AUTO_TEST_CASE(Dijkstra_ShortestPath) {
-	GraphNode node1(1), node2(2), node3(3), node4(4);
+	City node1(1), node2(2), node3(3), node4(4);
 
 	node1.connect(&node2);
 	node2.connect(&node3);
 	node3.connect(&node4);
 	node1.connect(&node3);
-	Graph graph({ node1, node2, node3, node4 });
+	Archadian Archadian({ node1, node2, node3, node4 });
 
-	auto distances = Algorithms::Dijkstra(&graph, node1);
+	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
 	assert(distances[&node1] == 0);
 	assert(distances[&node2] == 1);
@@ -22,9 +22,9 @@ BOOST_AUTO_TEST_CASE(Dijkstra_ShortestPath) {
 	assert(distances[&node4] == 2);
 }
 
-// Teste complexo do algoritmo de Dijkstra para calcular a distância mínima
-BOOST_AUTO_TEST_CASE( Dijkstra_ComplexShortestPath) {
-	GraphNode node1(1), node2(2), node3(3), node4(4), node5(5), node6(6);
+// Teste complexo do algoritmo de Dijkstra para calcular a distï¿½ncia mï¿½nima
+BOOST_AUTO_TEST_CASE(Dijkstra_ComplexShortestPath) {
+	City node1(1), node2(2), node3(3), node4(4), node5(5), node6(6);
 
 	node1.connect(&node2);
 	node1.connect(&node3);
@@ -36,9 +36,9 @@ BOOST_AUTO_TEST_CASE( Dijkstra_ComplexShortestPath) {
 	node5.connect(&node6);
 	node1.connect(&node6);
 
-	Graph graph({ node1, node2, node3, node4, node5, node6 });
+	Archadian Archadian({ node1, node2, node3, node4, node5, node6 });
 
-	auto distances = Algorithms::Dijkstra(&graph, node1);
+	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
 	assert(distances[&node1] == 0);
 	assert(distances[&node2] == 1);
@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE( Dijkstra_ComplexShortestPath) {
 }
 
 // Teste do algoritmo de Dijkstra em um grafo com ciclos
-BOOST_AUTO_TEST_CASE(Dijkstra_CycleGraphTest) {
-	GraphNode node1(1), node2(2), node3(3), node4(4);
+BOOST_AUTO_TEST_CASE(Dijkstra_CycleArchadianTest) {
+	City node1(1), node2(2), node3(3), node4(4);
 
 	node1.connect(&node2);
 	node2.connect(&node3);
@@ -58,9 +58,9 @@ BOOST_AUTO_TEST_CASE(Dijkstra_CycleGraphTest) {
 	node4.connect(&node2);
 	node3.connect(&node1);
 
-	Graph graph({ node1, node2, node3, node4 });
+	Archadian Archadian({ node1, node2, node3, node4 });
 
-	auto distances = Algorithms::Dijkstra(&graph, node1);
+	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
 	assert(distances[&node1] == 0);
 	assert(distances[&node2] == 1);
@@ -69,17 +69,17 @@ BOOST_AUTO_TEST_CASE(Dijkstra_CycleGraphTest) {
 }
 
 // Teste do algoritmo de Dijkstra em um grafo desconexo
-BOOST_AUTO_TEST_CASE(Dijkstra_DisconnectedGraphTest) {
-	GraphNode node1(1), node2(2), node3(3), node4(4), node5(5);
+BOOST_AUTO_TEST_CASE(Dijkstra_DisconnectedArchadianTest) {
+	City node1(1), node2(2), node3(3), node4(4), node5(5);
 
 	node1.connect(&node2);
 	node2.connect(&node3);
 
 	node4.connect(&node5);
 
-	Graph graph({ node1, node2, node3, node4, node5 });
+	Archadian Archadian({ node1, node2, node3, node4, node5 });
 
-	auto distances = Algorithms::Dijkstra(&graph, node1);
+	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
 	assert(distances[&node1] == 0);
 	assert(distances[&node2] == 1);
