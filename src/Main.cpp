@@ -39,7 +39,7 @@ bool isSubset(const std::vector<City>& subset, const std::vector<City>& superset
 }
 
 int main() {
-	int v, e;
+	std::size_t v, e;
 
 	std::cin >> v >> e;
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -47,7 +47,7 @@ int main() {
 	std::size_t index = 1;
 	std::unordered_map<std::string, City> map;
 
-	for (int i = 0; i < e; i++) {
+	for (std::size_t i = 0; i < e; i++) {
 		std::string s1, s2;
 
 		std::cin >> s1 >> s2;
