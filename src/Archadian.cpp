@@ -62,4 +62,5 @@ void Archadian::calcBattalionsAndPatrolling() {
 			++it;
 		}
 	}
+
 }

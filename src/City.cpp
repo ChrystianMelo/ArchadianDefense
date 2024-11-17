@@ -28,18 +28,7 @@ std::vector<Road>& City::getEdges() {
 void City::setEdges(std::vector<Road> edges) { m_edges = edges; }
 
 bool City::operator==(const City& other) const {
-	if (m_index != other.getIndex())
-		return false;
-
-	if (m_edges.size() != other.m_edges.size())
-		return false;
-
-	for (std::size_t i = 0; i < m_edges.size(); i++)
-		if (m_edges[i] != other.m_edges[i])
-			return false;
-
-	return true;
-
+	return m_index == other.getIndex();
 }
 
 bool City::operator<(const City& other) const {
