@@ -47,17 +47,17 @@ public:
 	/**
 	 *
 	 */
-	City* getCapital() const { return m_capital; }
+	City* getCapital() const;
 
 	/**
 	 *
 	 */
-	Battalions getBattalions() const { return m_battalions; }
+	Battalions getBattalions() const;
 
 	/**
 	 *
 	 */
-	std::vector<Patrolling> getPatrolling() const { return m_patrolling; }
+	std::vector<Patrolling> getPatrolling() const;
 
 private:
 	/**

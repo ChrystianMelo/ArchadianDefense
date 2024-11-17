@@ -16,6 +16,12 @@ std::vector<City>& Archadian::getNodes() {
 	return m_nodes;
 }
 
+City* Archadian::getCapital() const { return m_capital; }
+
+Battalions Archadian::getBattalions() const { return m_battalions; }
+
+std::vector<Patrolling> Archadian::getPatrolling() const { return m_patrolling; }
+
 void Archadian::calcCapital() {
 	std::unordered_map<City*, int, CityHash, CityEqual> distances;
 

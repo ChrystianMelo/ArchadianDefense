@@ -1,16 +1,31 @@
 #include <cassert>
-#include <limits> 
+#include <unordered_set>
 
 #include "Algorithms.h"
 
 namespace {
+	class VisitedNodeCollector : public NodeVisitor {
+	public:
+		explicit VisitedNodeCollector()
+			: visited_() {}
+
+		void visit(City* node) override {
+			visited_.insert(*node);
+		}
+
+		std::unordered_set<City> getVisited() {
+			return visited_;
+		}
+	private:
+		std::unordered_set<City> visited_;
+	};
+
 	/**
 	 * \brief
 	 */
 	class NullNodeVisitor : public NodeVisitor {
 	public:
-		void visit(City* node) override {
-		}
+		void visit(City* node) override {}
 	};
 
 	/**
@@ -31,10 +46,9 @@ namespace {
 				scc_ = SCC();
 				prev_dfs_main_visit = dfs_main_visit;
 			}
-		
-			if(prev_node != nullptr  && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
-				scc_.push_back(*dfs_recent_visit);
 
+			if (prev_node != nullptr && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
+				scc_.push_back(*dfs_recent_visit);
 			scc_.push_back(*node);
 			prev_node = node;
 		}
@@ -49,7 +63,7 @@ namespace {
 	private:
 		std::vector<SCC> m_sccs;
 		SCC scc_;                 // SCC atual sendo construído
-		City* prev_dfs_main_visit;     
+		City* prev_dfs_main_visit;
 		City* prev_node;     // Último nó visitado
 	};
 
@@ -159,19 +173,20 @@ void Algorithms::transposeArchadian(Archadian& Archadian) {
 
 
 std::vector<SCC> Algorithms::Kosaraju(Archadian* Archadian) {
-	NullNodeVisitor nullVisitor = NullNodeVisitor();
-	DFS_DATA data = Algorithms::DFS(Archadian, &nullVisitor);
+	VisitedNodeCollector visitor1 = VisitedNodeCollector();
+	DFS_DATA data = Algorithms::DFS(Archadian, &visitor1);
 	auto& finishingTime = std::get<2>(data);
 
 	Algorithms::transposeArchadian(*Archadian);
 
 	std::vector<City> nodes2 = sortNodesByFinishingTime(Archadian->getNodes(), finishingTime);
 
+	Algorithms::transposeArchadian(*Archadian);
+
 	SCCNodeVisitor visitor = SCCNodeVisitor();
 	Algorithms::DFS(nodes2, &visitor);
 	visitor.finalize();
 
-	Algorithms::transposeArchadian(*Archadian);
 
 	return visitor.getSCCS();
 }

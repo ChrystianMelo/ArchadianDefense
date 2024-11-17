@@ -40,12 +40,12 @@ bool isSubset(const std::vector<City>& subset, const std::vector<City>& superset
 
 int main() {
 	std::size_t v, e;
-
 	std::cin >> v >> e;
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 	std::size_t index = 1;
 	std::unordered_map<std::string, City> map;
+	std::vector<std::string> insertion_order;
 
 	for (std::size_t i = 0; i < e; i++) {
 		std::string s1, s2;
@@ -56,6 +56,7 @@ int main() {
 		if (auto it = map.find(s1); it == map.end()) {
 			map.insert({ s1, City(index++, s1) });
 			c1 = &map[s1];
+			insertion_order.push_back(s1);
 		}
 		else {
 			c1 = &it->second;
@@ -65,6 +66,7 @@ int main() {
 		if (auto it2 = map.find(s2); it2 == map.end()) {
 			map.insert({ s2, City(index++, s2) });
 			c2 = &map[s2];
+			insertion_order.push_back(s2);
 		}
 		else {
 			c2 = &it2->second;
@@ -72,11 +74,13 @@ int main() {
 
 		c1->connect(c2);
 	}
+
 	assert(map.size() == v);
 
 	std::vector<City> cities;
-	for (auto pair : map)
-		cities.push_back(pair.second);
+	for (const auto& name : insertion_order) {
+		cities.push_back(map[name]);
+	}
 
 	Archadian archadian = Archadian(cities);
 
