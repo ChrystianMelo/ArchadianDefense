@@ -8,10 +8,6 @@ void City::connect(City* node) {
 	m_edges.push_back(Road(this, node));
 }
 
-void City::disconnect(City* node) {
-	m_edges.erase(std::remove(m_edges.begin(), m_edges.end(), Road(this, node)), m_edges.end());
-}
-
 bool City::isConnected(City* node) {
 	for (Road& e : m_edges)
 		if (*e.getTarget() == *node)

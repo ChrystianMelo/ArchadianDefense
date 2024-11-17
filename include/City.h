@@ -72,11 +72,6 @@ public:
 	/**
 	 *
 	 */
-	void disconnect(City* node);
-
-	/**
-	 *
-	 */
 	bool isConnected(City* node);
 
 	/**
