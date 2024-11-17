@@ -23,6 +23,47 @@ private:
 	std::unordered_set<City> visited_;
 };
 
+
+/**
+ * \brief
+ */
+class SCCNodeVisitor : public NodeVisitor {
+public:
+	SCCNodeVisitor()
+		: m_sccs(), scc_(), prev_dfs_main_visit(nullptr), prev_node(nullptr) {}
+
+	void visit(City* node) override {
+		assert(dfs_main_visit != nullptr);
+
+		if (prev_dfs_main_visit == nullptr) prev_dfs_main_visit = dfs_main_visit;
+
+		if (prev_dfs_main_visit != dfs_main_visit && !scc_.empty()) {
+			m_sccs.push_back(scc_);
+			scc_ = SCC();
+			prev_dfs_main_visit = dfs_main_visit;
+		}
+
+		if (prev_node != nullptr && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
+			scc_.push_back(*dfs_recent_visit);
+		scc_.push_back(*node);
+		prev_node = node;
+	}
+
+	void finalize() {
+		if (!scc_.empty()) {
+			m_sccs.push_back(scc_);
+		}
+	}
+
+	std::vector<SCC> getSCCS() { return m_sccs; };
+private:
+	std::vector<SCC> m_sccs;
+	SCC scc_;                 // SCC atual sendo construído
+	City* prev_dfs_main_visit;
+	City* prev_node;     // Último nó visitado
+};
+
+
 bool isSubset(const std::vector<City>& subset, const std::vector<City>& superset) {
 	std::unordered_set<City> supersetSet(superset.begin(), superset.end());
 
@@ -93,6 +134,7 @@ int main() {
 	// Batalhao
 	if (patrollings.size() == 1 && patrollings[0][0].isConnected(capital)) {
 		std::cout << "0" << std::endl;
+		patrollings[0].insert(patrollings[0].begin(), *capital);
 	}
 	else {
 		std::cout << battalions.size() << std::endl;
@@ -104,7 +146,17 @@ int main() {
 	// Patrulhamento
 	std::cout << patrollings.size() << std::endl;
 	for (auto patrolling : patrollings) {
-		for (auto city : patrolling)
+		Archadian archadian2 = Archadian(patrolling);
+		Algorithms::transposeArchadian(archadian2);
+
+		SCCNodeVisitor visitedNodeCollector = SCCNodeVisitor();
+		auto dfs_data = Algorithms::DFS(&archadian2, &visitedNodeCollector);
+		visitedNodeCollector.finalize();
+		auto sccs = visitedNodeCollector.getSCCS();
+		assert(sccs.size() == 1);
+		std::vector<City> visited = sccs[0];
+
+		for (auto city : visited)
 			std::cout << city.getName() << " ";
 		std::cout << std::endl;
 	}

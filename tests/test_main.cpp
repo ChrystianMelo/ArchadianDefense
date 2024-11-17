@@ -127,6 +127,7 @@ BOOST_AUTO_TEST_CASE(IntegrationTest) {
 
         // Compara a saída gerada com a saída esperada
         BOOST_CHECK_MESSAGE(
+            //actualOutput == expectedOutput,
             compareStrings(actualOutput,expectedOutput),
             "Falha no teste para arquivo: " + inputFilePath +
             "\nSaída esperada:\n" + expectedOutput +

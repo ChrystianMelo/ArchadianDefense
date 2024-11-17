@@ -181,12 +181,11 @@ std::vector<SCC> Algorithms::Kosaraju(Archadian* Archadian) {
 
 	std::vector<City> nodes2 = sortNodesByFinishingTime(Archadian->getNodes(), finishingTime);
 
-	Algorithms::transposeArchadian(*Archadian);
-
 	SCCNodeVisitor visitor = SCCNodeVisitor();
 	Algorithms::DFS(nodes2, &visitor);
 	visitor.finalize();
 
+	Algorithms::transposeArchadian(*Archadian);
 
 	return visitor.getSCCS();
 }
