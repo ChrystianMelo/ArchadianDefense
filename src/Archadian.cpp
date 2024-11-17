@@ -23,7 +23,7 @@ std::vector<Patrolling> Archadian::getPatrolling() const { return m_patrolling; 
 bool Archadian::hasBattalions() const { return m_hasBattalions; }
 
 void Archadian::calcCapital() {
-	std::unordered_map<City*, int, CityHash, CityEqual> distances;
+	std::unordered_map<City*, std::size_t, CityHash, CityEqual> distances;
 
 	for (City& node : m_nodes) {
 		auto dijkstra = Algorithms::Dijkstra(this, node);
@@ -33,11 +33,11 @@ void Archadian::calcCapital() {
 
 		int sum = 0;
 		for (const auto& pair : dijkstra)
-			sum += pair.second.size();
+			sum += static_cast<int>(pair.second.size());
 		distances[&node] = sum;
 	}
 
-	int maior = std::numeric_limits<int>::max();
+	std::size_t maior = std::numeric_limits< std::size_t>::max();
 	for (const auto& pair : distances)
 		if (pair.second < maior && pair.second > 0) {
 			maior = pair.second;

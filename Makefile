@@ -1,6 +1,6 @@
 # Compilador e flags
 CXX = g++
-CXXFLAGS = -std=c++20 -g -Wall -I./include/
+CXXFLAGS = -std=c++20 -g -Wall -Wextra -Wpedantic -Wformat-security -Wconversion -Werror -I./include/
 LDFLAGS = -L /usr/local/lib -lboost_unit_test_framework
 
 # Diretórios

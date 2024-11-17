@@ -21,7 +21,7 @@ namespace {
 		 *
 		 * Esta implementação não realiza nenhuma ação.
 		 */
-		void visit(City* node) override {}
+		void visit([[maybe_unused]] City* node) override {}
 	};
 
 	/**
