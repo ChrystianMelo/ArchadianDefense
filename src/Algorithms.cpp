@@ -6,57 +6,39 @@
 
 namespace {
 	/**
-	 * \brief
+	 * \class NullNodeVisitor
+	 * \brief Um visitante de nó nulo que não realiza nenhuma operação.
+	 *
+	 * Essa classe é uma implementação padrão de `NodeVisitor` que não realiza
+	 * nenhuma ação nos nós visitados. Útil como implementação de fallback ou
+	 * quando nenhuma operação é necessária.
 	 */
 	class NullNodeVisitor : public NodeVisitor {
 	public:
+		/**
+		 * \brief Método chamado para visitar um nó.
+		 * \param node Ponteiro para o nó sendo visitado.
+		 *
+		 * Esta implementação não realiza nenhuma ação.
+		 */
 		void visit(City* node) override {}
 	};
 
 	/**
-	 * \brief
-	 */
-	class SCCNodeVisitor : public NodeVisitor {
-	public:
-		SCCNodeVisitor()
-			: m_sccs(), scc_(), prev_dfs_main_visit(nullptr), prev_node(nullptr) {}
-
-		void visit(City* node) override {
-			assert(dfs_main_visit != nullptr);
-
-			if (prev_dfs_main_visit == nullptr) prev_dfs_main_visit = dfs_main_visit;
-
-			if (prev_dfs_main_visit != dfs_main_visit && !scc_.empty()) {
-				m_sccs.push_back(scc_);
-				scc_ = SCC();
-				prev_dfs_main_visit = dfs_main_visit;
-			}
-
-			if (prev_node != nullptr && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
-				scc_.push_back(*dfs_recent_visit);
-			scc_.push_back(*node);
-			prev_node = node;
-		}
-
-		void finalize() {
-			if (!scc_.empty()) {
-				m_sccs.push_back(scc_);
-			}
-		}
-
-		std::vector<SCC> getSCCS() { return m_sccs; };
-	private:
-		std::vector<SCC> m_sccs;
-		SCC scc_;                 // SCC atual sendo construído
-		City* prev_dfs_main_visit;
-		City* prev_node;     // Último nó visitado
-	};
-
-
-	/**
-	 * \brief Metodo auxiliar
+	 * \brief Executa uma visita em profundidade (DFS) a partir de um nó.
 	 *
-	 * \see Algorithms::dfs()
+	 * \param node O nó inicial para a DFS.
+	 * \param time Ponteiro para o contador de tempo.
+	 * \param coloring Mapa de cores para rastrear o estado dos nós.
+	 * \param start Mapa de tempos de descoberta dos nós.
+	 * \param finish Mapa de tempos de finalização dos nós.
+	 * \param nodeVisitor Objeto visitante a ser aplicado em cada nó visitado.
+	 *
+	 * Essa função realiza uma busca em profundidade (DFS) em um grafo, registrando
+	 * tempos de descoberta e finalização, enquanto utiliza o `NodeVisitor` fornecido
+	 * para executar ações específicas durante a travessia.
+	 *
+	 * \note Complexidade: O(V + E), onde V é o número de nós e E o número de arestas.
 	 */
 	static void dfs_visit(City* node, std::size_t* time,
 		std::unordered_map<City*, CityColor, CityHash, CityEqual>* coloring,
@@ -81,8 +63,16 @@ namespace {
 	}
 
 	/**
-	* \brief
-	*/
+	 * \brief Ordena nós por seus tempos de finalização em ordem decrescente.
+	 *
+	 * \param nodes Vetor de nós a serem ordenados.
+	 * \param finishingTime Mapa contendo os tempos de finalização de cada nó.
+	 * \return Um vetor de nós ordenados por tempo de finalização em ordem decrescente.
+	 *
+	 * Essa função utiliza um algoritmo de ordenação Bubble Sort para reordenar os nós.
+	 *
+	 * \note Complexidade: O(n^2), onde n é o número de nós.
+	 */
 	std::vector<City> sortNodesByFinishingTime(
 		std::vector<City>& nodes,
 		std::unordered_map<City*, FinishingTime, CityHash, CityEqual>& finishingTime) {

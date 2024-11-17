@@ -5,44 +5,6 @@
 
 #include "Algorithms.h"
 
-namespace {
-	class SCCNodeVisitor : public NodeVisitor {
-	public:
-		SCCNodeVisitor()
-			: m_sccs(), scc_(), prev_dfs_main_visit(nullptr), prev_node(nullptr) {}
-
-		void visit(City* node) override {
-			assert(dfs_main_visit != nullptr);
-
-			if (prev_dfs_main_visit == nullptr) prev_dfs_main_visit = dfs_main_visit;
-
-			if (prev_dfs_main_visit != dfs_main_visit && !scc_.empty()) {
-				m_sccs.push_back(scc_);
-				scc_ = SCC();
-				prev_dfs_main_visit = dfs_main_visit;
-			}
-
-			if (prev_node != nullptr && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
-				scc_.push_back(*dfs_recent_visit);
-			scc_.push_back(*node);
-			prev_node = node;
-		}
-
-		void finalize() {
-			if (!scc_.empty()) {
-				m_sccs.push_back(scc_);
-			}
-		}
-
-		std::vector<SCC> getSCCS() { return m_sccs; };
-	private:
-		std::vector<SCC> m_sccs;
-		SCC scc_;                 // SCC atual sendo construído
-		City* prev_dfs_main_visit;
-		City* prev_node;     // Último nó visitado
-	};
-}
-
 Archadian::Archadian() : m_nodes(), m_capital() {}
 
 Archadian::Archadian(const std::vector<City>& nodes) : m_nodes(nodes) {

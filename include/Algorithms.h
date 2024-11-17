@@ -29,6 +29,86 @@ using DFS_DATA = std::tuple<
 using SCC = std::vector<City>;
 
 /**
+* \class SCCNodeVisitor
+* \brief Visitante de nós para a identificação de componentes fortemente conectadas (SCCs).
+*
+* Essa classe rastreia as componentes fortemente conectadas (SCCs) enquanto os nós
+* são visitados durante uma execução de busca em profundidade (DFS).
+*/
+class SCCNodeVisitor : public NodeVisitor {
+public:
+	/**
+	 * \brief Construtor padrão.
+	 *
+	 * Inicializa as estruturas necessárias para rastrear as SCCs.
+	 */
+	SCCNodeVisitor()
+		: m_sccs(), scc_(), prev_dfs_main_visit(nullptr), prev_node(nullptr) {}
+
+	/**
+	 * \brief Método chamado para visitar um nó.
+	 * \param node Ponteiro para o nó sendo visitado.
+	 *
+	 * Identifica e constrói as SCCs à medida que os nós são visitados.
+	 */
+	void visit(City* node) override {
+		assert(dfs_main_visit != nullptr);
+
+		if (prev_dfs_main_visit == nullptr) prev_dfs_main_visit = dfs_main_visit;
+
+		if (prev_dfs_main_visit != dfs_main_visit && !scc_.empty()) {
+			m_sccs.push_back(scc_);
+			scc_ = SCC();
+			prev_dfs_main_visit = dfs_main_visit;
+		}
+
+		if (prev_node != nullptr && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
+			scc_.push_back(*dfs_recent_visit);
+
+		scc_.push_back(*node);
+		prev_node = node;
+	}
+
+	/**
+	 * \brief Finaliza o rastreamento das SCCs.
+	 *
+	 * Adiciona a última SCC rastreada à lista, se necessário.
+	 */
+	void finalize() {
+		if (!scc_.empty()) {
+			m_sccs.push_back(scc_);
+		}
+	}
+
+	/**
+	 * \brief Obtém as SCCs identificadas.
+	 * \return Um vetor contendo todas as SCCs rastreadas.
+	 */
+	std::vector<SCC> getSCCS() { return m_sccs; }
+
+private:
+	/**
+	 * \brief Lista de componentes fortemente conectadas.
+	 */
+	std::vector<SCC> m_sccs;
+
+	/**
+	 * \brief A SCC atual sendo construída.
+	 */
+	SCC scc_;
+
+	/**
+	 * \brief Ponteiro para o nó principal da última visita DFS.
+	 */
+	City* prev_dfs_main_visit;
+
+	/**
+	 * \brief Ponteiro para o último nó visitado.
+	 */
+	City* prev_node;
+};
+
+/**
  * \class Algorithms
  *
  * \brief Algotimos aprendidos a partir do livro Algorithm Design de Jon Kleinberg
@@ -38,34 +118,42 @@ public:
 	/**
 	 * \brief Realiza uma busca em profundidade (DFS) em um grafo.
 	 *
-	 * Este método percorre o grafo começando de um nó e visita todos os nós conectados a ele de maneira recursiva,
-	 * utilizando o algoritmo de busca em profundidade (Depth-First Search, DFS).
+	 * Este método percorre o grafo começando a partir de um nó inicial e visita recursivamente
+	 * todos os nós conectados, registrando informações como tempos de descoberta e finalização.
 	 *
 	 * \param Archadian Um ponteiro para o objeto 'Archadian' que contém os nós e arestas a serem percorridos.
-	 * \param visitedNode Um 'std::function' que será executado em cada nó visitado durante a busca.
-	 *                    A função aceita um ponteiro para 'City' como argumento, permitindo que o comportamento
-	 *                    durante a visita a cada nó seja personalizado.
+	 *                  Este objeto representa o grafo sobre o qual a DFS será executada.
+	 * \param nodeVisitor Um ponteiro para uma função ou objeto que será chamado em cada nó visitado.
+	 *                    Permite a execução de ações específicas durante a visita a cada nó.
 	 *
-	 * \return *escrever aqui*
+	 * \return Um `DFS_DATA` contendo três mapas:
+	 *         - Um mapa que associa cada nó (City) ao seu estado (`CityColor`).
+	 *         - Um mapa que associa cada nó ao seu tempo de descoberta (`DiscoveryTime`).
+	 *         - Um mapa que associa cada nó ao seu tempo de finalização (`FinishingTime`).
 	 *
-	 * \note Complexidade: O(V + E), onde V é o número de vértices (nós) e E é o número de arestas do grafo.
+	 * \note Complexidade: O(V + E), onde V é o número de nós (vértices) e E é o número de arestas do grafo.
+	 *       A DFS percorre todos os nós e arestas uma única vez.
 	 */
 	static DFS_DATA DFS(Archadian* Archadian, NodeVisitor* nodeVisitor);
 
 	/**
-	 * \brief Realiza uma busca em profundidade (DFS) em um grafo.
+	 * \brief Realiza uma busca em profundidade (DFS) em um conjunto de nós.
 	 *
-	 * Este método percorre o grafo começando de um nó e visita todos os nós conectados a ele de maneira recursiva,
-	 * utilizando o algoritmo de busca em profundidade (Depth-First Search, DFS).
+	 * Este método executa a DFS em um subconjunto específico de nós, utilizando os nós
+	 * fornecidos como ponto de partida. Durante a execução, os nós visitados e suas
+	 * respectivas informações de descoberta e finalização são registrados.
 	 *
-	 * \param Archadian Um ponteiro para o objeto 'Archadian' que contém os nós e arestas a serem percorridos.
-	 * \param visitingNodes
-	 * \param nodeVisitor a função aceita um ponteiro para 'City' como argumento, permitindo que o comportamento
-	 *                    durante a visita a cada nó seja personalizado.
+	 * \param visitingNodes Um vetor contendo as cidades (City) a partir das quais a DFS será iniciada.
+	 * \param nodeVisitor Um ponteiro para uma função ou objeto que será chamado em cada nó visitado.
+	 *                    Permite a execução de ações específicas durante a visita a cada nó.
 	 *
-	 * \return *escrever aqui*
+	 * \return Um `DFS_DATA` contendo três mapas:
+	 *         - Um mapa que associa cada nó (City) ao seu estado (`CityColor`).
+	 *         - Um mapa que associa cada nó ao seu tempo de descoberta (`DiscoveryTime`).
+	 *         - Um mapa que associa cada nó ao seu tempo de finalização (`FinishingTime`).
 	 *
-	 * \note Complexidade: O(V + E), onde V é o número de vértices (nós) e E é o número de arestas do grafo.
+	 * \note Complexidade: O(V + E), onde V é o número de nós visitados e E é o número de arestas conectadas
+	 *       aos nós visitados. A DFS percorre apenas os nós e arestas acessíveis a partir dos nós fornecidos.
 	 */
 	static DFS_DATA DFS(std::vector<City>& visitingNodes, NodeVisitor* nodeVisitor);
 
@@ -111,7 +199,17 @@ public:
 	static std::unordered_map<City*, std::vector<City*>, CityHash, CityEqual> Dijkstra(Archadian* Archadian, City& source);
 
 	/**
-	 * \brief
+	 * \brief Move o elemento especificado para a primeira posição no vetor,
+	 * preservando a ordem relativa dos outros elementos.
+	 *
+	 * \tparam T Tipo dos elementos no vetor.
+	 * \param vec Vetor onde o elemento será movido.
+	 * \param value Valor que será movido para a primeira posição.
+	 *
+	 * /note Complexidade:
+	 * A complexidade no pior caso é O(n^2), onde n é o tamanho do vetor.
+	 * Isso ocorre porque, no pior caso, o elemento está na última posição,
+	 * e para cada passo, todos os swaps subsequentes são realizados.
 	 */
 	template <typename T>
 	static void moveToFirst(std::vector<T>& vec, const T& value) {

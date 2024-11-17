@@ -52,20 +52,19 @@ int main() {
 	}
 
 	Archadian archadian = Archadian(cities);
+
 	archadian.calcCapital();
 	archadian.calcBattalionsAndPatrolling();
 
 	auto capital = archadian.getCapital();
 	std::cout << capital.getName() << std::endl;
 
-	auto battalions = archadian.getBattalions();
-	auto patrollings = archadian.getPatrolling();
-
 	// Batalhao
 	if (!archadian.hasBattalions()) {
 		std::cout << "0" << std::endl;
 	}
 	else {
+		auto battalions = archadian.getBattalions();
 		std::cout << battalions.size() << std::endl;
 		for (auto city : battalions) {
 			std::cout << city.getName() << std::endl;
@@ -73,6 +72,7 @@ int main() {
 	}
 
 	// Patrulhamento
+	auto patrollings = archadian.getPatrolling();
 	std::cout << patrollings.size() << std::endl;
 	for (auto patrolling : patrollings) {
 		for (auto city : patrolling)
