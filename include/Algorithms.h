@@ -97,18 +97,18 @@ public:
 	static std::vector<SCC> Kosaraju(Archadian* Archadian);
 
 	/**
-	 * \brief Calcula as menores distâncias de um nó fonte para todos os outros nós em um grafo usando o algoritmo de Dijkstra.
+	 * \brief Calcula os caminhos mais curtos de um nó fonte para todos os outros nós em um grafo usando o algoritmo de Dijkstra.
 	 *
-	 * Este método encontra o caminho mais curto de um nó de origem para todos os outros nós do grafo, considerando pesos nas arestas.
+	 * Este método encontra os caminhos mais curtos de um nó de origem para todos os outros nós do grafo, considerando pesos nas arestas.
 	 *
 	 * \param Archadian Um ponteiro para o objeto 'Archadian' contendo os nós e arestas.
-	 * \param source O nó de origem a partir do qual as distâncias serão calculadas.
+	 * \param source O nó de origem a partir do qual os caminhos serão calculados.
 	 *
-	 * \return Um mapa que associa cada nó acessível a partir da origem com sua menor distância.
+	 * \return Um mapa que associa cada nó acessível a partir da origem com o vetor de cidades que compõem o caminho mais curto.
 	 *
 	 * \note Complexidade: O((V + E) * log(V)), onde V é o número de nós e E é o número de arestas do grafo.
 	 */
-	static std::unordered_map<City*, int, CityHash, CityEqual> Dijkstra(Archadian* Archadian, City& source);
+	static std::unordered_map<City*, std::vector<City*>, CityHash, CityEqual> Dijkstra(Archadian* Archadian, City& source);
 
 	/**
 	 * \brief

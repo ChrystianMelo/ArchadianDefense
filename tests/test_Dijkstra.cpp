@@ -16,14 +16,14 @@ BOOST_AUTO_TEST_CASE(Dijkstra_ShortestPath) {
 
 	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
-	BOOST_CHECK(distances[&node1] == 0);
-	BOOST_CHECK(distances[&node2] == 1);
-	BOOST_CHECK(distances[&node3] == 1);
-	BOOST_CHECK(distances[&node4] == 2);
+	BOOST_CHECK(distances.find(&node1) == distances.end());
+	BOOST_CHECK(distances[&node2].size() == 1);
+	BOOST_CHECK(distances[&node3].size() == 1);
+	BOOST_CHECK(distances[&node4].size() == 2);
 }
 
 // Teste complexo do algoritmo de Dijkstra para calcular a distância mínima
-BOOST_AUTO_TEST_CASE( Dijkstra_ComplexShortestPath) {
+BOOST_AUTO_TEST_CASE(Dijkstra_ComplexShortestPath) {
 	City node1(1), node2(2), node3(3), node4(4), node5(5), node6(6);
 
 	node1.connect(&node2);
@@ -40,12 +40,12 @@ BOOST_AUTO_TEST_CASE( Dijkstra_ComplexShortestPath) {
 
 	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
-	BOOST_CHECK(distances[&node1] == 0);
-	BOOST_CHECK(distances[&node2] == 1);
-	BOOST_CHECK(distances[&node3] == 1);
-	BOOST_CHECK(distances[&node4] == 2);
-	BOOST_CHECK(distances[&node5] == 2);
-	BOOST_CHECK(distances[&node6] == 1);
+	BOOST_CHECK(distances.find(&node1) == distances.end());
+	BOOST_CHECK(distances[&node2].size() == 1);
+	BOOST_CHECK(distances[&node3].size() == 1);
+	BOOST_CHECK(distances[&node4].size() == 2);
+	BOOST_CHECK(distances[&node5].size() == 2);
+	BOOST_CHECK(distances[&node6].size() == 1);
 }
 
 // Teste do algoritmo de Dijkstra em um grafo com ciclos
@@ -62,10 +62,10 @@ BOOST_AUTO_TEST_CASE(Dijkstra_CycleArchadianTest) {
 
 	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
-	BOOST_CHECK(distances[&node1] == 0);
-	BOOST_CHECK(distances[&node2] == 1);
-	BOOST_CHECK(distances[&node3] == 2);
-	BOOST_CHECK(distances[&node4] == 3);
+	BOOST_CHECK(distances.find(&node1) == distances.end());
+	BOOST_CHECK(distances[&node2].size() == 1);
+	BOOST_CHECK(distances[&node3].size() == 2);
+	BOOST_CHECK(distances[&node4].size() == 3);
 }
 
 // Teste do algoritmo de Dijkstra em um grafo desconexo
@@ -81,10 +81,10 @@ BOOST_AUTO_TEST_CASE(Dijkstra_DisconnectedArchadianTest) {
 
 	auto distances = Algorithms::Dijkstra(&Archadian, node1);
 
-	BOOST_CHECK(distances[&node1] == 0);
-	BOOST_CHECK(distances[&node2] == 1);
-	BOOST_CHECK(distances[&node3] == 2);
+	BOOST_CHECK(distances.find(&node1) == distances.end());
+	BOOST_CHECK(distances[&node2].size() == 1);
+	BOOST_CHECK(distances[&node3].size() == 2);
 
-	BOOST_CHECK(distances[&node4] == 999); //std::numeric_limits<int>::max());
-	BOOST_CHECK(distances[&node5] == 999); //std::numeric_limits<int>::max());
+	BOOST_CHECK(distances.find(&node4) == distances.end());
+	BOOST_CHECK(distances.find(&node5) == distances.end());
 }

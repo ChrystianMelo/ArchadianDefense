@@ -7,61 +7,6 @@
 
 #include "Algorithms.h"
 
-/**
- * \brief
- */
-class SCCNodeVisitor : public NodeVisitor {
-public:
-	SCCNodeVisitor()
-		: m_sccs(), scc_(), prev_dfs_main_visit(nullptr), prev_node(nullptr) {}
-
-	void visit(City* node) override {
-		assert(dfs_main_visit != nullptr);
-
-		if (prev_dfs_main_visit == nullptr) prev_dfs_main_visit = dfs_main_visit;
-
-		if (prev_dfs_main_visit != dfs_main_visit && !scc_.empty()) {
-			m_sccs.push_back(scc_);
-			scc_ = SCC();
-			prev_dfs_main_visit = dfs_main_visit;
-		}
-
-		if (prev_node != nullptr && dfs_recent_visit != nullptr && prev_node != dfs_recent_visit)
-			scc_.push_back(*dfs_recent_visit);
-		scc_.push_back(*node);
-		prev_node = node;
-	}
-
-	void finalize() {
-		if (!scc_.empty()) {
-			m_sccs.push_back(scc_);
-		}
-	}
-
-	std::vector<SCC> getSCCS() { return m_sccs; };
-private:
-	std::vector<SCC> m_sccs;
-	SCC scc_;                 // SCC atual sendo construído
-	City* prev_dfs_main_visit;
-	City* prev_node;     // Último nó visitado
-};
-
-
-bool isSubset(const std::vector<City>& subset, const std::vector<City>& superset) {
-	std::unordered_set<City> supersetSet(superset.begin(), superset.end());
-
-	for (const City& elem : subset) {
-		bool found = false;
-		for (const City& elem2 : subset)
-			if (elem.getIndex() == elem2.getIndex())
-				found = true;
-
-		if (!found)
-			return false;
-	}
-	return true;
-}
-
 int main() {
 	std::size_t v, e;
 	std::cin >> v >> e;
@@ -130,17 +75,7 @@ int main() {
 	// Patrulhamento
 	std::cout << patrollings.size() << std::endl;
 	for (auto patrolling : patrollings) {
-		Archadian archadian2 = Archadian(patrolling);
-		Algorithms::transposeArchadian(archadian2);
-
-		SCCNodeVisitor visitor = SCCNodeVisitor();
-		auto dfs_data = Algorithms::DFS(&archadian2, &visitor);
-		visitor.finalize();
-		auto sccs = visitor.getSCCS();
-		assert(sccs.size() == 1);
-		std::vector<City> visited = sccs[0];
-
-		for (auto city : visited)
+		for (auto city : patrolling)
 			std::cout << city.getName() << " ";
 		std::cout << std::endl;
 	}

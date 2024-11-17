@@ -1,5 +1,6 @@
 #include <cassert>
 #include <unordered_set>
+#include <limits>
 
 #include "Algorithms.h"
 
@@ -174,15 +175,16 @@ std::vector<SCC> Algorithms::Kosaraju(Archadian* archadian) {
 	return visitor.getSCCS();
 }
 
-std::unordered_map<City*, int, CityHash, CityEqual> Algorithms::Dijkstra(Archadian* Archadian, City& source) {
-	// Define a distância inicial como infinito
+std::unordered_map<City*, std::vector<City*>, CityHash, CityEqual> Algorithms::Dijkstra(Archadian* Archadian, City& source) {
 	std::unordered_map<City*, int, CityHash, CityEqual> distances;
+	std::unordered_map<City*, City*, CityHash, CityEqual> predecessors;
+
 	for (City& node : Archadian->getNodes()) {
-		distances[&node] = 999;//std::numeric_limits<int>::max();
+		distances[&node] = std::numeric_limits<int>::max();
+		predecessors[&node] = nullptr;
 	}
 	distances[&source] = 0;
 
-	// Fila de prioridade para selecionar o nodo com a menor distância
 	using NodeDistPair = std::pair<int, City*>;
 	std::priority_queue<NodeDistPair, std::vector<NodeDistPair>, std::greater<NodeDistPair>> queue;
 	queue.push({ 0, &source });
@@ -192,22 +194,46 @@ std::unordered_map<City*, int, CityHash, CityEqual> Algorithms::Dijkstra(Archadi
 		City* current = queue.top().second;
 		queue.pop();
 
-		// Ignorar se a distância é maior do que a registrada
-		int curretDistance = distances[current];
-		if (distance > curretDistance) continue;
+		int currentDistance = distances[current];
+		if (distance > currentDistance) continue;
 
-		// Verificar vizinhos
 		for (const Road& edge : current->getEdges()) {
 			City* neighbor = edge.getTarget();
 			int newDist = distances[current] + edge.getWeight();
 
-			// Atualizar a distância se o caminho atual é mais curto
 			if (newDist < distances[neighbor]) {
 				distances[neighbor] = newDist;
+				predecessors[neighbor] = current;
 				queue.push({ newDist, neighbor });
 			}
 		}
 	}
 
-	return distances;
+	std::unordered_map<City*, std::vector<City*>, CityHash, CityEqual> result;
+	for (const auto& pair : distances) {
+		City* node = pair.first;
+
+		if (*node == source) continue;
+
+		int distance = pair.second;
+
+		if (distance == std::numeric_limits<int>::max()) continue;
+
+		std::vector<City*> path;
+		for (City* at = node; at != nullptr; at = predecessors[at]) {
+			if (*at == source) continue;
+			path.push_back(at);
+		}
+
+		std::size_t n = path.size();
+		for (std::size_t i = 0; i < n / 2; ++i) {
+			City* temp = path[i];
+			path[i] = path[n - i - 1];
+			path[n - i - 1] = temp;
+		}
+
+		result[node] = path;
+	}
+
+	return result;
 }
