@@ -4,22 +4,6 @@
 #include "Algorithms.h"
 
 namespace {
-	class VisitedNodeCollector : public NodeVisitor {
-	public:
-		explicit VisitedNodeCollector()
-			: visited_() {}
-
-		void visit(City* node) override {
-			visited_.insert(*node);
-		}
-
-		std::unordered_set<City> getVisited() {
-			return visited_;
-		}
-	private:
-		std::unordered_set<City> visited_;
-	};
-
 	/**
 	 * \brief
 	 */
@@ -172,20 +156,20 @@ void Algorithms::transposeArchadian(Archadian& Archadian) {
 }
 
 
-std::vector<SCC> Algorithms::Kosaraju(Archadian* Archadian) {
-	VisitedNodeCollector visitor1 = VisitedNodeCollector();
-	DFS_DATA data = Algorithms::DFS(Archadian, &visitor1);
+std::vector<SCC> Algorithms::Kosaraju(Archadian* archadian) {
+	NullNodeVisitor nullNodeVisitor = NullNodeVisitor();
+	DFS_DATA data = Algorithms::DFS(archadian, &nullNodeVisitor);
 	auto& finishingTime = std::get<2>(data);
 
-	Algorithms::transposeArchadian(*Archadian);
+	Algorithms::transposeArchadian(*archadian);
 
-	std::vector<City> nodes2 = sortNodesByFinishingTime(Archadian->getNodes(), finishingTime);
+	std::vector<City> nodes2 = sortNodesByFinishingTime(archadian->getNodes(), finishingTime);
 
 	SCCNodeVisitor visitor = SCCNodeVisitor();
 	Algorithms::DFS(nodes2, &visitor);
 	visitor.finalize();
 
-	Algorithms::transposeArchadian(*Archadian);
+	Algorithms::transposeArchadian(*archadian);
 
 	return visitor.getSCCS();
 }

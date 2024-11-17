@@ -36,6 +36,16 @@ public:
 	Archadian(const std::vector<City>& nodes);
 
 	/**
+	 *
+	 */
+	void calcCapital();
+
+	/**
+	 *
+	 */
+	void calcBattalionsAndPatrolling();
+
+	/**
 	 * \brief Obtém os nós do grafo.
 	 * \return Referência ao vetor de Citys presentes no grafo.
 	 *
@@ -47,7 +57,7 @@ public:
 	/**
 	 *
 	 */
-	City* getCapital() const;
+	City getCapital() const;
 
 	/**
 	 *
@@ -60,15 +70,6 @@ public:
 	std::vector<Patrolling> getPatrolling() const;
 
 private:
-	/**
-	 *
-	 */
-	void calcCapital();
-
-	/**
-	 *
-	 */
-	void calcBattalionsAndPatrolling();
 
 	/**
 	 * \brief Armazena os nós (Citys) do grafo.
@@ -81,7 +82,7 @@ private:
 	/**
 	 *
 	 */
-	City* m_capital;
+	City m_capital;
 
 	/**
 	 *

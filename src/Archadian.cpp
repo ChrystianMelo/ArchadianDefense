@@ -5,18 +5,16 @@
 
 #include "Algorithms.h"
 
-Archadian::Archadian() : m_nodes(), m_capital(nullptr) {}
+Archadian::Archadian() : m_nodes(), m_capital() {}
 
 Archadian::Archadian(const std::vector<City>& nodes) : m_nodes(nodes) {
-	calcCapital();
-	calcBattalionsAndPatrolling();
 }
 
 std::vector<City>& Archadian::getNodes() {
 	return m_nodes;
 }
 
-City* Archadian::getCapital() const { return m_capital; }
+City Archadian::getCapital() const { return m_capital; }
 
 Battalions Archadian::getBattalions() const { return m_battalions; }
 
@@ -38,17 +36,18 @@ void Archadian::calcCapital() {
 	for (const auto& pair : distances)
 		if (pair.second < maior && pair.second > 0) {
 			maior = pair.second;
-			m_capital = pair.first;
+			m_capital = *pair.first;
 		}
-	assert(m_capital != nullptr);
 }
 
 void Archadian::calcBattalionsAndPatrolling() {
+	Algorithms::moveToFirst<City>(m_nodes, m_capital);
+
 	m_patrolling = Algorithms::Kosaraju(this);
 
 	// Remove o capitao.
 	for (auto it = m_patrolling.begin(); it != m_patrolling.end();) {
-		if (m_capital && it->size() == 1 && it->front().getIndex() == m_capital->getIndex()) {
+		if (it->size() == 1 && it->front().getIndex() == m_capital.getIndex()) {
 			it = m_patrolling.erase(it);
 		}
 		else {

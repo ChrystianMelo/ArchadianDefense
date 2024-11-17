@@ -110,6 +110,19 @@ public:
 	 */
 	static std::unordered_map<City*, int, CityHash, CityEqual> Dijkstra(Archadian* Archadian, City& source);
 
+	/**
+	 * \brief
+	 */
+	template <typename T>
+	static void moveToFirst(std::vector<T>& vec, const T& value) {
+		for (size_t i = 0; i < vec.size(); ++i) {
+			if (vec[i] == value) {
+				for (size_t j = i; j > 0; --j)
+					std::swap(vec[j], vec[j - 1]);
+				return;
+			}
+		}
+	}
 };
 
 #endif // ALGORITHMS_H
