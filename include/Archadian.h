@@ -71,14 +71,6 @@ private:
 	void calcBattalionsAndPatrolling();
 
 	/**
-	 * \brief Armazena os nós (Citys) do grafo.
-	 *
-	 * Um vetor que contém todos os nós (Citys) presentes no grafo. Cada nó
-	 * pode estar conectado a outros nós através de arestas (Roads).
-	 */
-	std::vector<City> m_nodes;
-
-	/**
 	 *
 	 */
 	City* m_capital;
@@ -92,6 +84,14 @@ private:
 	 *
 	 */
 	std::vector<Patrolling> m_patrolling;
+
+	/**
+	 * \brief Armazena os nós (Citys) do grafo.
+	 *
+	 * Um vetor que contém todos os nós (Citys) presentes no grafo. Cada nó
+	 * pode estar conectado a outros nós através de arestas (Roads).
+	 */
+	std::vector<City> m_nodes;
 };
 
 #endif // Archadian_H

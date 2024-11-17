@@ -1,6 +1,6 @@
 #include "City.h"
 
-City::City() : m_index(0) , m_name("") {}
+City::City() : m_index(0) {}
 
 City::City(std::size_t index, std::string name) : m_index(index), m_name(name) {}
 
