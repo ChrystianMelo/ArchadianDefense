@@ -69,6 +69,10 @@ public:
 	 */
 	std::vector<Patrolling> getPatrolling() const;
 
+	/**
+	 *
+	 */
+	bool hasBattalions() const;
 private:
 
 	/**
@@ -93,6 +97,11 @@ private:
 	 *
 	 */
 	std::vector<Patrolling> m_patrolling;
+
+	/**
+	 *
+	 */
+	bool m_hasBattalions = false;
 };
 
 #endif // Archadian_H

@@ -20,6 +20,8 @@ Battalions Archadian::getBattalions() const { return m_battalions; }
 
 std::vector<Patrolling> Archadian::getPatrolling() const { return m_patrolling; }
 
+bool Archadian::hasBattalions() const { return m_hasBattalions; }
+
 void Archadian::calcCapital() {
 	std::unordered_map<City*, int, CityHash, CityEqual> distances;
 
@@ -45,6 +47,8 @@ void Archadian::calcBattalionsAndPatrolling() {
 
 	m_patrolling = Algorithms::Kosaraju(this);
 
+	m_hasBattalions = !(m_patrolling.size() == 1 && m_patrolling[0][0] == m_capital);
+
 	// Remove o capitao.
 	for (auto it = m_patrolling.begin(); it != m_patrolling.end();) {
 		if (it->size() == 1 && it->front().getIndex() == m_capital.getIndex()) {
@@ -56,7 +60,8 @@ void Archadian::calcBattalionsAndPatrolling() {
 	}
 
 	for (auto patrolling : m_patrolling)
-		m_battalions.push_back(patrolling[0]);
+		if (auto battalion = patrolling[0]; patrolling[0] != m_capital)
+			m_battalions.push_back(patrolling[0]);
 
 	// Nenhuma patrulha é possível, pois ao sair de qualquer batalhão
 	for (auto it = m_patrolling.begin(); it != m_patrolling.end();) {

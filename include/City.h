@@ -101,6 +101,11 @@ public:
 	/**
 	 *
 	 */
+	bool operator!=(const City& other) const;
+
+	/**
+	 *
+	 */
 	bool operator<(const City& other) const;
 
 	/**

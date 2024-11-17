@@ -7,23 +7,6 @@
 
 #include "Algorithms.h"
 
-class VisitedNodeCollector : public NodeVisitor {
-public:
-	explicit VisitedNodeCollector()
-		: visited_() {}
-
-	void visit(City* node) override {
-		visited_.insert(*node);
-	}
-
-	std::unordered_set<City> getVisited() {
-		return visited_;
-	}
-private:
-	std::unordered_set<City> visited_;
-};
-
-
 /**
  * \brief
  */
@@ -134,7 +117,7 @@ int main() {
 	auto patrollings = archadian.getPatrolling();
 
 	// Batalhao
-	if (patrollings.size() == 1 && patrollings[0][0] == capital) {
+	if (!archadian.hasBattalions()) {
 		std::cout << "0" << std::endl;
 	}
 	else {
@@ -150,10 +133,10 @@ int main() {
 		Archadian archadian2 = Archadian(patrolling);
 		Algorithms::transposeArchadian(archadian2);
 
-		SCCNodeVisitor visitedNodeCollector = SCCNodeVisitor();
-		auto dfs_data = Algorithms::DFS(&archadian2, &visitedNodeCollector);
-		visitedNodeCollector.finalize();
-		auto sccs = visitedNodeCollector.getSCCS();
+		SCCNodeVisitor visitor = SCCNodeVisitor();
+		auto dfs_data = Algorithms::DFS(&archadian2, &visitor);
+		visitor.finalize();
+		auto sccs = visitor.getSCCS();
 		assert(sccs.size() == 1);
 		std::vector<City> visited = sccs[0];
 

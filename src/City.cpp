@@ -27,6 +27,10 @@ bool City::operator==(const City& other) const {
 	return m_index == other.getIndex();
 }
 
+bool City::operator!=(const City& other) const {
+	return m_index != other.getIndex();
+}
+
 bool City::operator<(const City& other) const {
 	return this->m_index < other.getIndex();
 }
