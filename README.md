@@ -49,7 +49,7 @@ The `Archadian` class encapsulates the graph and provides methods to:
 
 ### Overall Project Complexity
 - `O((1 + p)⋅(V + E)⋅log V)`  
-Where `p` is the number of patrols performed.
+Where `p` is the number of strongly connected components in the graph.
 
 ---
 
